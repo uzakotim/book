@@ -1,60 +1,55 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import ChapterCard from './ChapterCard';
 import { Plus } from 'lucide-react';
 
 const BookEditor = ({ bookData, updateBookData, moveItem, deleteItem, generateUniqueId }) => {
+  // Generic nested updater to reduce duplication
+  const updateNested = (chapterId, sectionId, contentId, newData) => {
+    updateBookData(
+      bookData.map(ch => {
+        if (ch.id !== chapterId) return ch;
+
+        if (!sectionId) {
+          return { ...ch, ...newData }; // update chapter
+        }
+
+        return {
+          ...ch,
+          sections: ch.sections.map(sec => {
+            if (sec.id !== sectionId) return sec;
+
+            if (!contentId) {
+              return { ...sec, ...newData }; // update section
+            }
+
+            return {
+              ...sec,
+              content: sec.content.map(cont =>
+                cont.id === contentId ? { ...cont, ...newData } : cont
+              ),
+            };
+          }),
+        };
+      })
+    );
+  };
 
   const addChapter = () => {
     const newChapter = {
       id: generateUniqueId(),
       type: 'chapter',
-      name: 'New Chapter ' + (bookData.length + 1),
-      sections: []
+      name: `New Chapter ${bookData.length + 1}`,
+      sections: [],
     };
     updateBookData([...bookData, newChapter]);
   };
 
-  const updateChapter = (chapterId, newChapterData) => {
-    updateBookData(bookData.map(ch =>
-      ch.id === chapterId ? { ...ch, ...newChapterData } : ch
-    ));
-  };
-
-  const updateSection = (chapterId, sectionId, newSectionData) => {
-    updateBookData(bookData.map(ch => {
-      if (ch.id === chapterId) {
-        return {
-          ...ch,
-          sections: ch.sections.map(sec =>
-            sec.id === sectionId ? { ...sec, ...newSectionData } : sec
-          )
-        };
-      }
-      return ch;
-    }));
-  };
-
-  const updateContent = (chapterId, sectionId, contentId, newContentData) => {
-    updateBookData(bookData.map(ch => {
-      if (ch.id === chapterId) {
-        return {
-          ...ch,
-          sections: ch.sections.map(sec => {
-            if (sec.id === sectionId) {
-              return {
-                ...sec,
-                content: sec.content.map(cont =>
-                  cont.id === contentId ? { ...cont, ...newContentData } : cont
-                )
-              };
-            }
-            return sec;
-          })
-        };
-      }
-      return ch;
-    }));
-  };
+  // Wrappers for clarity
+  const updateChapter = (chapterId, data) => updateNested(chapterId, null, null, data);
+  const updateSection = (chapterId, sectionId, data) =>
+    updateNested(chapterId, sectionId, null, data);
+  const updateContent = (chapterId, sectionId, contentId, data) =>
+    updateNested(chapterId, sectionId, contentId, data);
 
   return (
     <div className="space-y-6 lg:space-y-8 max-w-4xl mx-auto py-8">

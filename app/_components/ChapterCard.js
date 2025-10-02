@@ -3,8 +3,8 @@ import SectionCard from './SectionCard';
 import EditableText from './EditableText';
 import { Plus, ArrowUp, ArrowDown, Trash } from 'lucide-react';
 
-const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, updateSection, updateContent, moveItem, deleteItem, generateUniqueId }) => {
 
+const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, updateSection, updateContent, moveItem, deleteItem, generateUniqueId }) => {
   const addSection = () => {
     const newSection = {
       id: generateUniqueId(),

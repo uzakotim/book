@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+        "connectionId": "uzakotim",
+        "projectKey": "uzakotim_book"
+    }
+}
