@@ -80,10 +80,10 @@ const EditableText = ({ text, onSave, className, placeholder = "Edit text" }) =>
       ) : (
         <div className="flex flex-grow items-center space-x-2">
           <span
+            role='button'
             onClick={() => setIsEditing(true)}
             onKeyDown={(e) => e.key === 'Enter' && setIsEditing(true)}
             className={`${className} cursor-pointer break-words`}
-            tabIndex={0}
             onTouchStart={() => setIsEditing(true)}
           >
             {text || <span className="opacity-60">{placeholder}</span>}
