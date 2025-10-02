@@ -6,7 +6,7 @@ import BookEditor from "./_components/BookEditor";
 // ---------- Helpers ----------
 const generateUniqueId = () => uuidv4();
 
-const deepCopy = (data) => JSON.parse(JSON.stringify(data));
+const deepCopy = (data) => structuredClone(data);
 
 // Reusable move logic
 const performMove = (list, itemId, dir) => {
@@ -39,13 +39,13 @@ const handleMoveItem = (setBookData) => (id, type, parentId, direction) => {
     }
 
     if (type === "content") {
-      newBookData.forEach((ch) => {
-        ch.sections.forEach((sec) => {
-          if (sec.id === parentId) {
-            sec.content = performMove(sec.content, id, direction);
+      for (const chapter of newBookData) {
+        for (const section of chapter.sections) {
+          if (section.id === parentId) {
+            section.content = performMove(section.content, id, direction);
           }
-        });
-      });
+        }
+      }
     }
 
     return newBookData;
@@ -54,7 +54,7 @@ const handleMoveItem = (setBookData) => (id, type, parentId, direction) => {
 
 const handleDeleteItem = (setBookData) => (id, type, parentId) => {
   if (
-    !window.confirm(
+    !globalThis.confirm(
       `Are you sure you want to delete this ${type}? This action cannot be undone.`
     )
   ) {
@@ -77,13 +77,13 @@ const handleDeleteItem = (setBookData) => (id, type, parentId) => {
     }
 
     if (type === "content") {
-      newBookData.forEach((ch) => {
-        ch.sections.forEach((sec) => {
-          if (sec.id === parentId) {
-            sec.content = sec.content.filter((cont) => cont.id !== id);
+      for (const chapter of newBookData) {
+        for (const section of chapter.sections) {
+          if (section.id === parentId) {
+            section.content = section.content.filter((cont) => cont.id !== id);
           }
-        });
-      });
+        }
+      }
     }
 
     return newBookData;

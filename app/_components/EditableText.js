@@ -1,6 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Edit, Check, X } from 'lucide-react';
 
+EditableText.propTypes = {
+  text: PropTypes.string.isRequired,
+  onSave: PropTypes.func.isRequired,
+  className: PropTypes.string,
+  placeholder: PropTypes.string,
+};
 const EditableText = ({ text, onSave, className, placeholder = "Edit text" }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentText, setCurrentText] = useState(text);

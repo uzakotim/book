@@ -2,6 +2,33 @@ import React from 'react';
 import ChapterCard from './ChapterCard';
 import { Plus } from 'lucide-react';
 
+BookEditor.propTypes = {
+  bookData: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      sections: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string.isRequired,
+          type: PropTypes.string.isRequired,
+          name: PropTypes.string.isRequired,
+          content: PropTypes.arrayOf(
+            PropTypes.shape({
+              id: PropTypes.string.isRequired,
+              type: PropTypes.string.isRequired,
+              text: PropTypes.string.isRequired,
+            })
+          ).isRequired,
+        })
+      ).isRequired,
+    })
+  ).isRequired,
+  updateBookData: PropTypes.func.isRequired,
+  moveItem: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
+  generateUniqueId: PropTypes.func.isRequired,
+};
 const BookEditor = ({ bookData, updateBookData, moveItem, deleteItem, generateUniqueId }) => {
   // Generic nested updater to reduce duplication
   const updateNested = (chapterId, sectionId, contentId, newData) => {

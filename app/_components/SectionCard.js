@@ -3,6 +3,30 @@ import EditableText from './EditableText';
 import ContentArea from './ContentArea';
 import { Plus, ArrowUp, ArrowDown, Trash } from 'lucide-react';
 
+SectionCard.propTypes = {
+  chapterId: PropTypes.string.isRequired,
+  section: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    content: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired,
+        text: PropTypes.string.isRequired,
+        parentId: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  sectionIndex: PropTypes.number.isRequired,
+  totalSections: PropTypes.number.isRequired,
+  chapterNumber: PropTypes.number.isRequired,
+  updateSection: PropTypes.func.isRequired,
+  updateContent: PropTypes.func.isRequired,
+  moveItem: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
+  generateUniqueId: PropTypes.func.isRequired,
+};
 const SectionCard = ({ chapterId, section, sectionIndex, totalSections, chapterNumber, updateSection, updateContent, moveItem, deleteItem, generateUniqueId }) => {
 
   const addContent = () => {
