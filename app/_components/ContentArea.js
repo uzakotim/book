@@ -1,20 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUp, ArrowDown, Trash } from 'lucide-react';
 
-ContentArea.propTypes = {
-  chapterId: PropTypes.string.isRequired,
-  sectionId: PropTypes.string.isRequired,
-  content: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    type: PropTypes.oneOf(['content']).isRequired,
-    text: PropTypes.string.isRequired,
-  }).isRequired,
-  contentIndex: PropTypes.number.isRequired,
-  totalContent: PropTypes.number.isRequired,
-  updateContent: PropTypes.func.isRequired,
-  moveItem: PropTypes.func.isRequired,
-  deleteItem: PropTypes.func.isRequired,
-};
+import PropTypes from 'prop-types';
+
 const ContentArea = ({ chapterId, sectionId, content, contentIndex, totalContent, updateContent, moveItem, deleteItem }) => {
   const [text, setText] = useState(content.text);
   const textareaRef = useRef(null);
@@ -92,4 +80,18 @@ const ContentArea = ({ chapterId, sectionId, content, contentIndex, totalContent
   );
 };
 
+ContentArea.propTypes = {
+  chapterId: PropTypes.string.isRequired,
+  sectionId: PropTypes.string.isRequired,
+  content: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(['content']).isRequired,
+    text: PropTypes.string.isRequired,
+  }).isRequired,
+  contentIndex: PropTypes.number.isRequired,
+  totalContent: PropTypes.number.isRequired,
+  updateContent: PropTypes.func.isRequired,
+  moveItem: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
+};
 export default ContentArea;

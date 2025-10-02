@@ -3,36 +3,8 @@ import SectionCard from './SectionCard';
 import EditableText from './EditableText';
 import { Plus, ArrowUp, ArrowDown, Trash } from 'lucide-react';
 
-ChapterCard.propTypes = {
-  chapter: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    sections: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        parentId: PropTypes.string.isRequired,
-        content: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
-            text: PropTypes.string.isRequired,
-          })
-        ).isRequired,
-      })
-    ).isRequired,
-  }).isRequired,
-  chapterIndex: PropTypes.number.isRequired,
-  totalChapters: PropTypes.number.isRequired,
-  updateChapter: PropTypes.func.isRequired,
-  updateSection: PropTypes.func.isRequired,
-  updateContent: PropTypes.func.isRequired,
-  moveItem: PropTypes.func.isRequired,
-  deleteItem: PropTypes.func.isRequired,
-  generateUniqueId: PropTypes.func.isRequired,
-};
+import PropTypes from 'prop-types';
+
 const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, updateSection, updateContent, moveItem, deleteItem, generateUniqueId }) => {
   const addSection = () => {
     const newSection = {
@@ -144,4 +116,34 @@ const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, upda
   );
 };
 
+ChapterCard.propTypes = {
+  chapter: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    sections: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        parentId: PropTypes.string.isRequired,
+        content: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            type: PropTypes.string.isRequired,
+            text: PropTypes.string.isRequired,
+          })
+        ).isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  chapterIndex: PropTypes.number.isRequired,
+  totalChapters: PropTypes.number.isRequired,
+  updateChapter: PropTypes.func.isRequired,
+  updateSection: PropTypes.func.isRequired,
+  updateContent: PropTypes.func.isRequired,
+  moveItem: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
+  generateUniqueId: PropTypes.func.isRequired,
+};
 export default ChapterCard;
