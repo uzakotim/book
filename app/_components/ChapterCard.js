@@ -2,21 +2,21 @@ import React from 'react';
 import SectionCard from './SectionCard';
 import EditableText from './EditableText';
 import { Plus, ArrowUp, ArrowDown, Trash } from 'lucide-react';
-
 import PropTypes from 'prop-types';
 
-const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, updateSection, updateContent, moveItem, deleteItem, generateUniqueId }) => {
-  const addSection = () => {
-    const newSection = {
-      id: generateUniqueId(),
-      type: 'section',
-      name: 'New Section ' + (chapter.sections.length + 1),
-      parentId: chapter.id,
-      content: []
-    };
-    updateChapter(chapter.id, { sections: [...chapter.sections, newSection] });
-  };
-
+const ChapterCard = ({
+  chapter,
+  chapterIndex,
+  totalChapters,
+  updateChapter,
+  updateSection,
+  updateContent,
+  moveItem,
+  deleteItem,
+  addSection,
+  addContent,
+}) => {
+  // ---------- Handlers ----------
   const handleChapterNameChange = (newName) => {
     updateChapter(chapter.id, { name: newName });
   };
@@ -29,18 +29,22 @@ const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, upda
     deleteItem(chapter.id, 'chapter', null);
   };
 
+  const handleAddSection = () => {
+    addSection(chapter.id);
+  };
+
   const canMoveUp = chapterIndex > 1;
   const canMoveDown = chapterIndex < totalChapters;
 
+  // ---------- Render ----------
   return (
-    <div 
-      className="relative bg-transparent  p-6 sm:p-8 rounded-3xl mb-6 group transition-all duration-300  ease-in-out"
-    >
-      {/* Chapter Number and Name */}
+    <div className="relative bg-transparent p-6 sm:p-8 rounded-3xl mb-6 group transition-all duration-300 ease-in-out">
+      {/* Chapter Header */}
       <div className="flex items-center mb-6 space-x-4">
         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white text-lg font-bold shadow-md">
           {chapterIndex}
         </div>
+
         <div className="flex-grow min-w-0">
           <EditableText
             text={chapter.name}
@@ -49,13 +53,18 @@ const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, upda
             placeholder="Chapter Title"
           />
         </div>
-        {/* Action Buttons for Chapter */}
+
+        {/* Chapter Controls */}
         <div className="flex items-center space-x-2">
           <div className="flex flex-col space-y-1">
             <button
               onClick={() => handleMoveChapter('up')}
               disabled={!canMoveUp}
-              className={`p-1 rounded-full ${canMoveUp ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 opacity-50 cursor-not-allowed'} transition-colors duration-200`}
+              className={`p-1 rounded-full ${
+                canMoveUp
+                  ? 'bg-white/10 hover:bg-white/20'
+                  : 'bg-white/5 opacity-50 cursor-not-allowed'
+              } transition-colors duration-200`}
               title="Move Chapter Up"
             >
               <ArrowUp className="h-5 w-5 text-primary" />
@@ -63,12 +72,17 @@ const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, upda
             <button
               onClick={() => handleMoveChapter('down')}
               disabled={!canMoveDown}
-              className={`p-1 rounded-full ${canMoveDown ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 opacity-50 cursor-not-allowed'} transition-colors duration-200`}
+              className={`p-1 rounded-full ${
+                canMoveDown
+                  ? 'bg-white/10 hover:bg-white/20'
+                  : 'bg-white/5 opacity-50 cursor-not-allowed'
+              } transition-colors duration-200`}
               title="Move Chapter Down"
             >
               <ArrowDown className="h-5 w-5 text-primary" />
             </button>
           </div>
+
           <button
             onClick={handleDeleteChapter}
             className="p-2 rounded-2xl bg-rose-700 hover:bg-rose-600 text-white shadow-md transition-colors duration-200"
@@ -79,9 +93,8 @@ const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, upda
         </div>
       </div>
 
-      <div 
-        className="relative pl-6 sm:pl-8 space-y-4 pt-4 sm:pt-6"
-      >
+      {/* Sections */}
+      <div className="relative pl-6 sm:pl-8 space-y-4 pt-4 sm:pt-6">
         {chapter.sections.map((section, secIndex) => (
           <div
             key={section.id}
@@ -97,14 +110,15 @@ const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, upda
               updateContent={updateContent}
               moveItem={moveItem}
               deleteItem={deleteItem}
-              generateUniqueId={generateUniqueId}
+              addContent={addContent}
             />
           </div>
         ))}
 
+        {/* Add Section Button */}
         <div className="flex justify-end mt-6 pr-4 sm:pr-6">
           <button
-            onClick={addSection}
+            onClick={handleAddSection}
             className="flex items-center space-x-2 bg-primary/90 hover:bg-primary text-white font-semibold py-2 px-5 rounded-2xl shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-75 text-sm"
           >
             <Plus className="h-4 w-4" />
@@ -119,18 +133,14 @@ const ChapterCard = ({ chapter, chapterIndex, totalChapters, updateChapter, upda
 ChapterCard.propTypes = {
   chapter: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    type: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     sections: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-        parentId: PropTypes.string.isRequired,
         content: PropTypes.arrayOf(
           PropTypes.shape({
             id: PropTypes.string.isRequired,
-            type: PropTypes.string.isRequired,
             text: PropTypes.string.isRequired,
           })
         ).isRequired,
@@ -144,6 +154,8 @@ ChapterCard.propTypes = {
   updateContent: PropTypes.func.isRequired,
   moveItem: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
-  generateUniqueId: PropTypes.func.isRequired,
+  addSection: PropTypes.func.isRequired,
+  addContent: PropTypes.func.isRequired,
 };
+
 export default ChapterCard;

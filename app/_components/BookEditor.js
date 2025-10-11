@@ -1,60 +1,81 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import ChapterCard from './ChapterCard';
 import { Plus } from 'lucide-react';
 
-import PropTypes from 'prop-types';
+const BookEditor = ({
+  chapters,
+  sections,
+  contents,
+  setChapters,
+  setSections,
+  setContents,
+  moveItem,
+  deleteItem,
+  generateUniqueId,
+}) => {
+  // ----------- Combine normalized data for rendering ----------
+  const bookData = useMemo(() => {
+    return chapters.map((chapter) => ({
+      ...chapter,
+      sections: sections
+        .filter((s) => s.chapterId === chapter.id)
+        .map((section) => ({
+          ...section,
+          content: contents.filter((c) => c.sectionId === section.id),
+        })),
+    }));
+  }, [chapters, sections, contents]);
 
-const BookEditor = ({ bookData, updateBookData, moveItem, deleteItem, generateUniqueId }) => {
-  // Generic nested updater to reduce duplication
-  const updateNested = (chapterId, sectionId, contentId, newData) => {
-    updateBookData(
-      bookData.map(ch => {
-        if (ch.id !== chapterId) return ch;
-
-        if (!sectionId) {
-          return { ...ch, ...newData }; // update chapter
-        }
-
-        return {
-          ...ch,
-          sections: ch.sections.map(sec => {
-            if (sec.id !== sectionId) return sec;
-
-            if (!contentId) {
-              return { ...sec, ...newData }; // update section
-            }
-
-            return {
-              ...sec,
-              content: sec.content.map(cont =>
-                cont.id === contentId ? { ...cont, ...newData } : cont
-              ),
-            };
-          }),
-        };
-      })
+  // ----------- Updaters ----------
+  const updateChapter = (chapterId, data) => {
+    setChapters((prev) =>
+      prev.map((ch) => (ch.id === chapterId ? { ...ch, ...data } : ch))
     );
   };
 
+  const updateSection = (sectionId, data) => {
+    setSections((prev) =>
+      prev.map((sec) => (sec.id === sectionId ? { ...sec, ...data } : sec))
+    );
+  };
+
+  const updateContent = (contentId, data) => {
+    setContents((prev) =>
+      prev.map((cont) => (cont.id === contentId ? { ...cont, ...data } : cont))
+    );
+  };
+
+  // ----------- Add Handlers ----------
   const addChapter = () => {
     const newChapter = {
       id: generateUniqueId(),
-      type: 'chapter',
-      name: `New Chapter ${bookData.length + 1}`,
-      sections: [],
+      name: 'New Chapter',
     };
-    updateBookData([...bookData, newChapter]);
+    setChapters((prev) => [...prev, newChapter]);
   };
 
-  // Wrappers for clarity
-  const updateChapter = (chapterId, data) => updateNested(chapterId, null, null, data);
-  const updateSection = (chapterId, sectionId, data) =>
-    updateNested(chapterId, sectionId, null, data);
-  const updateContent = (chapterId, sectionId, contentId, data) =>
-    updateNested(chapterId, sectionId, contentId, data);
+  const addSection = (chapterId) => {
+    const newSection = {
+      id: generateUniqueId(),
+      chapterId,
+      name: 'New Section',
+    };
+    setSections((prev) => [...prev, newSection]);
+  };
 
+  const addContent = (sectionId) => {
+    const newContent = {
+      id: generateUniqueId(),
+      sectionId,
+      text: 'New Content...',
+    };
+    setContents((prev) => [...prev, newContent]);
+  };
+
+  // ----------- Render ----------
   return (
-    <div className="space-y-6 lg:space-y-8 max-w-4xl mx-auto py-8">
+    <div className="space-y-6 lg:space-y-8 max-w-6xl mx-auto py-8">
       {bookData.map((chapter, index) => (
         <div
           key={chapter.id}
@@ -69,6 +90,8 @@ const BookEditor = ({ bookData, updateBookData, moveItem, deleteItem, generateUn
             updateContent={updateContent}
             moveItem={moveItem}
             deleteItem={deleteItem}
+            addSection={addSection}
+            addContent={addContent}
             generateUniqueId={generateUniqueId}
           />
         </div>
@@ -88,30 +111,15 @@ const BookEditor = ({ bookData, updateBookData, moveItem, deleteItem, generateUn
 };
 
 BookEditor.propTypes = {
-  bookData: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      sections: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string.isRequired,
-          type: PropTypes.string.isRequired,
-          name: PropTypes.string.isRequired,
-          content: PropTypes.arrayOf(
-            PropTypes.shape({
-              id: PropTypes.string.isRequired,
-              type: PropTypes.string.isRequired,
-              text: PropTypes.string.isRequired,
-            })
-          ).isRequired,
-        })
-      ).isRequired,
-    })
-  ).isRequired,
-  updateBookData: PropTypes.func.isRequired,
+  chapters: PropTypes.array.isRequired,
+  sections: PropTypes.array.isRequired,
+  contents: PropTypes.array.isRequired,
+  setChapters: PropTypes.func.isRequired,
+  setSections: PropTypes.func.isRequired,
+  setContents: PropTypes.func.isRequired,
   moveItem: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
   generateUniqueId: PropTypes.func.isRequired,
 };
+
 export default BookEditor;
