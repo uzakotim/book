@@ -22,7 +22,7 @@ const ContentArea = ({ chapterId, sectionId, content, contentIndex, totalContent
 
   const handleChange = (e) => {
     setText(e.target.value);
-    updateContent(chapterId, sectionId, content.id, { text: e.target.value });
+    updateContent(content.id, { text: e.target.value });
   };
 
   const handleMoveContent = (direction) => {
