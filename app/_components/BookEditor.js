@@ -28,51 +28,110 @@ const BookEditor = ({
   }, [chapters, sections, contents]);
 
   // ----------- Updaters ----------
-  const updateChapter = (chapterId, data) => {
+  const updateChapter = async (chapterId, data) => {
     setChapters((prev) =>
-      prev.map((ch) => (ch.id === chapterId ? { ...ch, ...data } : ch))
+      prev.map((ch) =>
+        ch.id === chapterId ? { ...ch, ...data } : ch
+      )
     );
+
+    // Sync with Convex
+    // try {
+      // await convex.mutations.chapters.update({ id: chapterId, data });
+    // } catch (error) {
+      // console.error("Failed to update chapter in Convex:", error);
+    // }
   };
 
-  const updateSection = (sectionId, data) => {
+  const updateSection = async (sectionId, data) => {
     setSections((prev) =>
-      prev.map((sec) => (sec.id === sectionId ? { ...sec, ...data } : sec))
+      prev.map((sec) =>
+        sec.id === sectionId ? { ...sec, ...data } : sec
+      )
     );
+
+    // Sync with Convex
+    // try {
+      // await convex.mutations.sections.update({ id: sectionId, data });
+    // } catch (error) {
+      // console.error("Failed to update section in Convex:", error);
+    // }
   };
 
-  const updateContent = (contentId, data) => {
+  const updateContent = async (contentId, data) => {
     setContents((prev) =>
-      prev.map((cont) => (cont.id === contentId ? { ...cont, ...data } : cont))
+      prev.map((cont) =>
+        cont.id === contentId ? { ...cont, ...data } : cont
+      )
     );
+
+    // Sync with Convex
+    // try {
+      // await convex.mutations.contents.update({ id: contentId, data });
+    // } catch (error) {
+      // console.error("Failed to update content in Convex:", error);
+    // }
   };
 
-  // ----------- Add Handlers ----------
-  const addChapter = () => {
-    const newChapter = {
-      id: generateUniqueId(),
-      name: 'New Chapter',
-    };
-    setChapters((prev) => [...prev, newChapter]);
+  // ----------- Add Handlers -----------
+  const addChapter = async () => {
+    setChapters((prev) => {
+      const newChapter = {
+        id: generateUniqueId(),
+        type: "chapter",
+        name: "New Chapter",
+        position: prev.length, // last position
+      };
+      const updated = [...prev, newChapter];
+      // TODO: CREATE IN CONVEX
+      // createInConvex("chapter", newChapter);
+      return updated;
+    });
   };
 
-  const addSection = (chapterId) => {
-    const newSection = {
-      id: generateUniqueId(),
-      chapterId,
-      name: 'New Section',
-    };
-    setSections((prev) => [...prev, newSection]);
+  const addSection = async (chapterId) => {
+    setSections((prev) => {
+      const chapterSections = prev.filter((s) => s.chapterId === chapterId);
+      const newSection = {
+        id: generateUniqueId(),
+        type: "section",
+        chapterId,
+        name: "New Section",
+        position: chapterSections.length, // next available position in this chapter
+      };
+      const updated = [...prev, newSection];
+      // TODO: CREATE IN CONVEX
+      // createInConvex("section", newSection);
+      return updated;
+    });
   };
 
-  const addContent = (sectionId) => {
-    const newContent = {
-      id: generateUniqueId(),
-      sectionId,
-      text: 'New Content...',
-    };
-    setContents((prev) => [...prev, newContent]);
+  const addContent = async (sectionId) => {
+    setContents((prev) => {
+      const sectionContents = prev.filter((c) => c.sectionId === sectionId);
+      const newContent = {
+        id: generateUniqueId(),
+        type: "content",
+        sectionId,
+        text: "New Content...",
+        position: sectionContents.length, // next available position
+      };
+      const updated = [...prev, newContent];
+      // TODO: CREATE IN CONVEX
+      // createInConvex("content", newContent);
+      return updated;
+    });
   };
 
+  // const createInConvex = async (type, item) => {
+  //   try {
+  //     if (type === "chapter") await convex.mutations.chapters.create(item);
+  //     if (type === "section") await convex.mutations.sections.create(item);
+  //     if (type === "content") await convex.mutations.contents.create(item);
+  //   } catch (error) {
+  //     console.error("Error creating item in Convex:", error);
+  //   }
+  // };
   // ----------- Render ----------
   return (
     <div className="space-y-6 lg:space-y-8 max-w-6xl mx-auto py-8">
