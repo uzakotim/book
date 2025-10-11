@@ -92,7 +92,6 @@ const BookEditor = ({
             deleteItem={deleteItem}
             addSection={addSection}
             addContent={addContent}
-            generateUniqueId={generateUniqueId}
           />
         </div>
       ))}

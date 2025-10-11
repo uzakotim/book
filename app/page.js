@@ -76,16 +76,17 @@ const handleDeleteItem = (setChapters, setSections, setContents) =>
 
   if (type === "chapter") {
     setChapters((prev) => prev.filter((ch) => ch.id !== id));
-
     // Cascade delete: sections + contents under this chapter
-    setSections((prevSecs) => prevSecs.filter((sec) => sec.chapterId !== id));
-    setContents((prevConts, _, allSections) =>
-      prevConts.filter(
-        (cont) =>
-          !allSections.some(
-            (sec) => sec.chapterId === id && sec.id === cont.sectionId
-          )
-      )
+    // First, capture which section IDs are being deleted
+    let deletedSectionIds = [];
+    setSections((prevSecs) => {
+      const sectionsToDelete = prevSecs.filter((sec) => sec.chapterId === id);
+      deletedSectionIds = sectionsToDelete.map((sec) => sec.id);
+      return prevSecs.filter((sec) => sec.chapterId !== id);
+    });
+    // Then delete contents belonging to those sections
+    setContents((prevConts) =>
+      prevConts.filter((cont) => !deletedSectionIds.includes(cont.sectionId))
     );
   }
 
@@ -174,7 +175,6 @@ export default function Home() {
         content: contents.filter((cont) => cont.sectionId === sec.id),
       })),
   }));
-  const updateBookData = useCallback((newData) => setBookData(newData), []);
   const moveItem = handleMoveItem(setChapters, setSections, setContents);
   const deleteItem = handleDeleteItem(setChapters, setSections, setContents);
   return (
@@ -188,7 +188,6 @@ export default function Home() {
           setSections={setSections}
           setContents={setContents}
           bookData={bookData}
-          updateBookData={updateBookData}
           moveItem={moveItem}
           deleteItem={deleteItem}
           generateUniqueId={generateUniqueId}
